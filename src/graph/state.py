@@ -3,6 +3,13 @@ from __future__ import annotations
 from typing import Literal, Optional, TypedDict
 
 
+class ImageRef(TypedDict):
+    b64: str
+    ext: str
+    caption: str
+    page_num: int
+
+
 class Section(TypedDict):
     id: str
     heading: str
@@ -42,8 +49,10 @@ class NotesState(TypedDict):
     medium: Literal["english", "hindi"]
 
     plan: list[Section]
+    mindmap_svg: Optional[str]
     research: dict[str, str]
     aggregated_research: dict[str, str]
+    images: dict[str, list[ImageRef]]
     draft_notes: dict[str, str]
     formatted_notes: str
     pyqs: list[QA]

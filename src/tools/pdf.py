@@ -54,6 +54,30 @@ def render_html(formatted_notes: str, pyqs_html: str, template_vars: dict | None
     )
 
 
+def render_html_with_mindmap(
+    formatted_notes: str,
+    pyqs_html: str,
+    mindmap_svg: str = "",
+    images_html: str = "",
+    template_vars: dict | None = None,
+) -> str:
+    env = Environment(
+        loader=FileSystemLoader(str(TEMPLATES_DIR)),
+        autoescape=select_autoescape(["html", "xml"]),
+    )
+    template = env.get_template("notes_template.html")
+
+    body_html = markdown_to_html(formatted_notes)
+
+    return template.render(
+        notes_body=body_html,
+        pyqs_body=pyqs_html,
+        mindmap_svg=mindmap_svg,
+        images_html=images_html,
+        **(template_vars or {}),
+    )
+
+
 def export_pdf(html_content: str, output_path: str) -> str:
     browser = _get_browser()
     page = browser.new_page()

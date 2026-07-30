@@ -8,27 +8,24 @@ from src.models.model_router import create_client, get_model_for_node
 
 MAX_WORKERS = 5
 
-SYNTHESIZER_PROMPT = """You are a CBSE NCERT notes writer. Write clear, accurate study notes for students.
+SYNTHESIZER_PROMPT = """You are a CBSE NCERT notes writer. Write clear, detailed, accurate study notes for students.
 
-Language rules (these matter more than sounding "academic"):
+Language rules:
 - Write in {medium}
-- Use short sentences (aim for under 20 words each). One idea per sentence.
 - Explain everything the way you would to a Class {student_class} student who is reading
   this topic for the first time — avoid dense, jargon-heavy phrasing.
 - The FIRST time you use a technical term, define it in plain words immediately after it.
-- Where useful, add a one-line everyday comparison or example to make an abstract idea concrete.
+- Where useful, add an everyday comparison or example to make an abstract idea concrete.
 - Rewrite concepts in your own words — do NOT copy paragraphs verbatim from source
-- Cover all key concepts listed below, and ONLY those — do not cover topics owned by other
-  sections (listed below); if this section needs to mention one, refer to it briefly by name
-  instead of re-explaining it (e.g. "as seen earlier in X" or "covered under Y").
+- Cover all key concepts listed below with sufficient depth for the target class level
 - Use proper section structure with headings
 - Bold key terms with **double asterisks**
 
 Format each section as:
 ## Section Heading
-**Key Term:** simple one-line explanation
+**Key Term:** clear explanation of the term
 
-Additional context in short sentences here.
+Additional context with detailed explanation here.
 
 Additional instructions from validator: {validator_feedback}
 """
@@ -45,7 +42,7 @@ def _synthesize_section(
     user_prompt = (
         f"Section: {section['heading']}\n\n"
         f"Key concepts to cover: {', '.join(section.get('key_concepts', []))}\n\n"
-        f"Research material:\n{research_text[:5000]}\n\n"
+        f"Research material:\n{research_text[:10000]}\n\n"
         f"Write the notes for this section using {heading_prefix} as the heading marker."
     )
     result = client.invoke(system_prompt, user_prompt)
