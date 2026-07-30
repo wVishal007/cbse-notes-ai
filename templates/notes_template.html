@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>{{ title }} — {{ subtitle }}</title>
+<style>
+{% include 'notes.css' %}
+</style>
+</head>
+<body>
+
+<div class="title-block">
+    <h1>{{ title }}</h1>
+    <p class="subtitle">{{ subtitle }}</p>
+    <p class="meta">Medium: {{ medium }} | CBSE NCERT Reference</p>
+</div>
+
+{{ notes_body | safe }}
+
+{% if pyqs_body %}
+<hr class="page-break">
+{{ pyqs_body | safe }}
+{% endif %}
+
+</body>
+</html>

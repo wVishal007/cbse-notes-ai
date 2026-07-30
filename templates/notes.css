@@ -1,0 +1,193 @@
+/* CBSE Notes PDF Stylesheet */
+
+body {
+    font-family: 'Segoe UI', 'Noto Sans', Arial, sans-serif;
+    font-size: 11pt;
+    line-height: 1.6;
+    color: #1a1a1a;
+    margin: 0;
+    padding: 0;
+}
+
+/* Cover / Title Block */
+.title-block {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 3px solid #1a73e8;
+}
+
+.title-block h1 {
+    font-size: 16pt;
+    font-weight: bold;
+    color: #1a73e8;
+    margin: 0 0 5px 0;
+}
+
+.title-block .subtitle {
+    font-size: 14pt;
+    color: #333;
+    margin: 5px 0;
+}
+
+.title-block .meta {
+    font-size: 10pt;
+    color: #666;
+    margin: 5px 0;
+}
+
+/* Headings */
+h1 {
+    font-size: 16pt;
+    font-weight: bold;
+    color: #1a1a1a;
+    margin-top: 24px;
+    margin-bottom: 10px;
+    page-break-after: avoid;
+}
+
+h2 {
+    font-size: 14pt;
+    font-weight: bold;
+    color: #333;
+    margin-top: 20px;
+    margin-bottom: 8px;
+    page-break-after: avoid;
+}
+
+h3 {
+    font-size: 12pt;
+    font-weight: bold;
+    color: #555;
+    margin-top: 16px;
+    margin-bottom: 6px;
+    page-break-after: avoid;
+}
+
+/* Body text */
+p {
+    margin: 8px 0;
+    text-align: justify;
+}
+
+strong, b {
+    font-weight: bold;
+    color: #000;
+}
+
+/* Lists */
+ul, ol {
+    margin: 8px 0;
+    padding-left: 24px;
+}
+
+li {
+    margin: 4px 0;
+}
+
+/* Tables */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 10pt;
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 8px 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #f0f4ff;
+    font-weight: bold;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Horizontal rule */
+hr {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 20px 0;
+}
+
+/* Practice Questions Section */
+.qa-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin: 10px 0;
+    background: #fafafa;
+}
+
+.qa-card .q-number {
+    font-weight: bold;
+    font-size: 12pt;
+    margin: 0 0 4px 0;
+    color: #1a73e8;
+}
+
+.qa-card .badge {
+    display: inline-block;
+    font-size: 8pt;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+.qa-card .badge-mcq { background: #e3f2fd; color: #1565c0; }
+.qa-card .badge-short { background: #fce4ec; color: #c62828; }
+.qa-card .badge-long { background: #f3e5f5; color: #6a1b9a; }
+.qa-card .badge-case-based { background: #e8f5e9; color: #2e7d32; }
+
+.qa-card .question {
+    font-size: 11pt;
+    margin: 8px 0;
+}
+
+.qa-card .answer {
+    font-size: 10pt;
+    color: #333;
+    margin: 8px 0;
+    padding: 8px;
+    background: #f0f0f0;
+    border-radius: 4px;
+}
+
+details {
+    margin-top: 8px;
+}
+
+summary {
+    cursor: pointer;
+    font-size: 10pt;
+    color: #1a73e8;
+    font-weight: bold;
+}
+
+/* Page breaks */
+.page-break {
+    page-break-before: always;
+}
+
+/* Code blocks */
+code {
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 10pt;
+    background: #f5f5f5;
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+
+pre {
+    background: #f5f5f5;
+    padding: 12px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 10pt;
+}
