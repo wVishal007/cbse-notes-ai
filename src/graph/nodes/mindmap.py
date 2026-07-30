@@ -24,7 +24,7 @@ def _build_mindmap_definition(state: NotesState) -> str:
     for section in plan:
         heading = _qq(section["heading"])
         level = section.get("level", 1)
-        indent = "  " * level
+        indent = "  " * (level + 1)
         lines.append(f"{indent}{heading}")
         for sub in section.get("subheadings", []):
             lines.append(f"{indent}  {_qq(sub)}")

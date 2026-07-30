@@ -32,7 +32,8 @@ def build_graph() -> StateGraph:
     workflow.set_entry_point("planner")
 
     workflow.add_edge("planner", "mindmap_generator")
-    workflow.add_edge("mindmap_generator", "research")
+    workflow.add_edge("planner", "research")
+    workflow.add_edge("mindmap_generator", "aggregator")
     workflow.add_edge("research", "aggregator")
     workflow.add_edge("aggregator", "synthesizer")
     workflow.add_edge("synthesizer", "validator")

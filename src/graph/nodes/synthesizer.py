@@ -4,7 +4,9 @@ import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from src.graph.state import NotesState, Section
-from src.models.model_router import create_client, get_model_for_node
+from src.models.clients.base import LLMClient
+from src.models.clients.gemini import GeminiClient
+from src.models.clients.groq import GroqClient
 
 MAX_WORKERS = 5
 
@@ -32,7 +34,7 @@ Additional instructions from validator: {validator_feedback}
 
 
 def _synthesize_section(
-    client: MistralClient,
+    client: LLMClient,
     system_prompt: str,
     section: Section,
     research_text: str,
@@ -50,8 +52,6 @@ def _synthesize_section(
 
 
 def synthesizer_node(state: NotesState) -> dict:
-    _, _ = get_model_for_node("synthesizer")
-
     plan = state.get("plan", [])
     research = state.get("research", {})
     aggregated = state.get("aggregated_research", {})
@@ -67,9 +67,15 @@ def synthesizer_node(state: NotesState) -> dict:
     heading_by_id = {s["id"]: s["heading"] for s in plan}
     concepts_by_id = {s["id"]: s.get("key_concepts", []) for s in plan}
 
+    synthesize_clients = [
+        GeminiClient("models/gemini-3.1-flash-lite"),
+        GeminiClient("models/gemini-3.5-flash-lite"),
+        GroqClient("llama-3.1-8b-instant"),
+    ]
+
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as pool:
         futures = []
-        for section in plan:
+        for i, section in enumerate(plan):
             section_id = section["id"]
             agg_research = aggregated.get(section_id, "")
             if agg_research:
@@ -86,15 +92,22 @@ def synthesizer_node(state: NotesState) -> dict:
                 for sid in heading_by_id
                 if sid != section_id and concepts_by_id.get(sid)
             ]
+            mode_instruction = (
+                "Expand each section with 2-3 concrete real-world examples, step-by-step "
+                "explanations, and detailed comparisons. Write 2-3× more content per section."
+            ) if state.get("note_mode") == "detailed" else ""
             system_prompt = SYNTHESIZER_PROMPT.format(
                 medium=state["medium"],
                 student_class=state["student_class"],
                 validator_feedback=validator_feedback,
             )
+            if mode_instruction:
+                system_prompt += "\n\n" + mode_instruction
             if other_topics:
                 system_prompt += "\nTopics owned by other sections: " + "; ".join(other_topics)
 
-            client = create_client("synthesizer")
+            time.sleep(i * 0.15)
+            client = synthesize_clients[i % len(synthesize_clients)]
             futures.append(pool.submit(_synthesize_section, client, system_prompt, section, research_text))
 
         for future in as_completed(futures):

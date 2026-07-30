@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { BookText, Languages, Sparkles } from 'lucide-react'
+import { BookText, FileText, FileSpreadsheet, Languages, Sparkles } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
@@ -27,6 +27,7 @@ export function NotesForm({ onSubmit, disabled }: NotesFormProps) {
   const [subject, setSubject] = useState('')
   const [chapter, setChapter] = useState('')
   const [medium, setMedium] = useState<'english' | 'hindi'>('english')
+  const [noteMode, setNoteMode] = useState<'short' | 'detailed'>('short')
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   function validate(): boolean {
@@ -46,6 +47,7 @@ export function NotesForm({ onSubmit, disabled }: NotesFormProps) {
       subject: subject.trim(),
       chapter: chapter.trim(),
       medium,
+      note_mode: noteMode,
     }
     toast.success('Starting note generation...')
     onSubmit(payload)
@@ -101,6 +103,36 @@ export function NotesForm({ onSubmit, disabled }: NotesFormProps) {
                 {opt.label}
               </button>
             ))}
+          </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="block text-sm font-medium text-gray-700">Note Detail</label>
+          <div className="flex rounded-xl border-2 border-gray-200 overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setNoteMode('short')}
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium transition-all duration-200 min-h-[44px]
+                ${noteMode === 'short'
+                  ? 'bg-primary text-white shadow-sm'
+                  : 'bg-white text-gray-600 hover:bg-gray-50'
+                }`}
+            >
+              <FileText className="h-4 w-4 flex-shrink-0" />
+              Short
+            </button>
+            <button
+              type="button"
+              onClick={() => setNoteMode('detailed')}
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium transition-all duration-200 min-h-[44px]
+                ${noteMode === 'detailed'
+                  ? 'bg-primary text-white shadow-sm'
+                  : 'bg-white text-gray-600 hover:bg-gray-50'
+                }`}
+            >
+              <FileSpreadsheet className="h-4 w-4 flex-shrink-0" />
+              Detailed
+            </button>
           </div>
         </div>
 

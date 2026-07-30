@@ -4,7 +4,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from src.graph.state import NotesState, Section
-from src.models.model_router import create_client, get_model_for_node
+from src.models.clients.gemini import GeminiClient
 
 MAX_WORKERS = 5
 
@@ -38,7 +38,11 @@ def _aggregate_section(
 
 
 def aggregator_node(state: NotesState) -> dict:
-    _, _ = get_model_for_node("aggregator")
+    _pool = [
+        GeminiClient("models/gemini-3.5-flash-lite"),
+        GeminiClient("gemma-4-26b-a4b-it"),
+        GeminiClient("gemma-4-26b-a4b-it"),
+    ]
 
     research = state.get("research", {})
     plan: list[Section] = state.get("plan", [])
@@ -47,17 +51,18 @@ def aggregator_node(state: NotesState) -> dict:
     aggregated: dict[str, str] = {}
     t0 = time.time()
 
-    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as pool:
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         futures = []
-        for section_id, chunks in research.items():
-            client = create_client("aggregator")
+        for i, (section_id, chunks) in enumerate(research.items()):
+            client = _pool[i % len(_pool)]
+            time.sleep(i * 0.15)
             combined = "\n\n".join(
                 f"[Source: {c['source_url']}]\n{c['text']}" for c in chunks[:10]
             )
             other_headings = [h for sid, h in heading_by_id.items() if sid != section_id]
             heading = heading_by_id.get(section_id, section_id)
             futures.append(
-                pool.submit(_aggregate_section, client, section_id, heading, other_headings, combined)
+                executor.submit(_aggregate_section, client, section_id, heading, other_headings, combined)
             )
 
         for future in as_completed(futures):

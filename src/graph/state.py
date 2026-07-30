@@ -1,13 +1,10 @@
 from __future__ import annotations
 
-from typing import Literal, Optional, TypedDict
+from typing import Annotated, Literal, Optional, TypedDict
 
 
-class ImageRef(TypedDict):
-    b64: str
-    ext: str
-    caption: str
-    page_num: int
+def merge_timing(a: dict[str, float], b: dict[str, float]) -> dict[str, float]:
+    return {**a, **b}
 
 
 class Section(TypedDict):
@@ -47,12 +44,12 @@ class NotesState(TypedDict):
     subject: str
     chapter: str
     medium: Literal["english", "hindi"]
+    note_mode: Literal["short", "detailed"]
 
     plan: list[Section]
     mindmap_svg: Optional[str]
     research: dict[str, str]
     aggregated_research: dict[str, str]
-    images: dict[str, list[ImageRef]]
     draft_notes: dict[str, str]
     formatted_notes: str
     pyqs: list[QA]
@@ -66,4 +63,4 @@ class NotesState(TypedDict):
     pdf_path: Optional[str]
 
     errors: list[str]
-    timing: dict[str, float]
+    timing: Annotated[dict[str, float], merge_timing]

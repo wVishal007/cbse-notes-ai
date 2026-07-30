@@ -5,7 +5,10 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from src.cache.research_cache import get_cached, set_cached
 from src.graph.state import NotesState, Section, SourceChunk
-from src.tools.scraper import extract_from_pdf, extract_images_from_pdf, extract_text
+from src.tools.scraper import (
+    extract_from_pdf,
+    extract_text,
+)
 from src.tools.search import search_subtopic, to_source_chunks
 
 MAX_WORKERS = 6
@@ -57,7 +60,6 @@ def research_node(state: NotesState) -> dict:
             query_to_sections.setdefault(query, []).append(section["id"])
 
     all_research: dict[str, list[SourceChunk]] = {sec["id"]: [] for sec in plan}
-    all_images: dict[str, list[dict]] = {}
 
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as pool:
         future_to_query = {
@@ -86,25 +88,13 @@ def research_node(state: NotesState) -> dict:
                             )
                         )
 
-    pdf_urls: dict[str, list[str]] = {}
-    for section in plan:
-        for r in all_research.get(section["id"], []):
-            url = r.get("source_url", "")
-            if url.endswith(".pdf"):
-                pdf_urls.setdefault(url, []).append(section["id"])
-    for pdf_url, sec_ids in pdf_urls.items():
-        imgs = extract_images_from_pdf(pdf_url)
-        if imgs:
-            for sec_id in sec_ids:
-                all_images.setdefault(sec_id, []).extend(imgs)
-
     set_cached(
         state["student_class"],
         state["subject"],
         state["chapter"],
         state["medium"],
-        {"research": all_research, "images": all_images, "plan": plan},
+        {"research": all_research, "plan": plan},
     )
 
     elapsed = time.time() - t0
-    return {"research": all_research, "images": all_images, "timing": {"research": elapsed}}
+    return {"research": all_research, "timing": {"research": elapsed}}

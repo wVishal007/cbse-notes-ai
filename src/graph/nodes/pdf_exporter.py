@@ -10,33 +10,6 @@ from src.tools.pdf import export_pdf, render_html_with_mindmap
 OUTPUT_DIR = Path(__file__).resolve().parent.parent.parent.parent / "output"
 
 
-def _mime_type(ext: str) -> str:
-    return {"png": "image/png", "jpeg": "image/jpeg", "jpg": "image/jpeg"}.get(ext, "image/png")
-
-
-def _format_images(images: dict[str, list[dict]]) -> str:
-    if not images:
-        return ""
-    all_images: list[str] = []
-    for section_id, imgs in images.items():
-        if not imgs:
-            continue
-        for img in imgs:
-            b64 = img.get("b64", "")
-            ext = img.get("ext", "png")
-            caption = img.get("caption", "")
-            if b64:
-                mime = _mime_type(ext)
-                all_images.append(
-                    f'<figure class="notes-figure">'
-                    f'<img class="notes-image" src="data:{mime};base64,{b64}" alt="{caption}">'
-                    f"<figcaption>{caption}</figcaption></figure>"
-                )
-    if not all_images:
-        return ""
-    return '<div class="images-section"><h2>Chapter Visuals</h2>' + "\n".join(all_images) + "</div>"
-
-
 def _format_pyqs(pyqs: list[dict]) -> str:
     if not pyqs:
         return "<p>No practice questions generated.</p>"
@@ -46,6 +19,12 @@ def _format_pyqs(pyqs: list[dict]) -> str:
         q_type = qa.get("question_type", "Short")
         marks = qa.get("marks", 2)
         badge = f"<span class='badge badge-{q_type.lower()}'>{q_type} | {marks} mark{'s' if marks > 1 else ''}</span>"
+        answer = qa.get("answer", "")
+        points = [ln.strip().lstrip("- *") for ln in answer.split("\n") if ln.strip().startswith(("- ", "* "))]
+        if points:
+            answer_html = "<ul>" + "".join(f"<li>{p}</li>" for p in points) + "</ul>"
+        else:
+            answer_html = f"<p class='answer'>{answer}</p>"
         parts.append(
             f"<div class='qa-card'>"
             f"<p class='q-number'>Q{i}.</p>"
@@ -53,7 +32,7 @@ def _format_pyqs(pyqs: list[dict]) -> str:
             f"<p class='question'>{qa.get('question', '')}</p>"
             f"<div class='answer-block'>"
             f"<p class='answer-label'>Answer</p>"
-            f"<p class='answer'>{qa.get('answer', '')}</p>"
+            f"{answer_html}"
             f"</div></div>"
         )
     return "\n".join(parts)
@@ -72,8 +51,6 @@ def pdf_exporter_node(state: NotesState) -> dict:
     formatted = state.get("formatted_notes", "")
     pyqs = state.get("pyqs", [])
     mindmap_svg = state.get("mindmap_svg", "")
-    images = state.get("images", {})
-    images_html = _format_images(images)
 
     pyqs_html = _format_pyqs(pyqs)
 
@@ -84,7 +61,7 @@ def pdf_exporter_node(state: NotesState) -> dict:
     }
 
     html_content = render_html_with_mindmap(
-        formatted, pyqs_html, mindmap_svg, images_html, template_vars
+        formatted, pyqs_html, mindmap_svg, template_vars
     )
     export_pdf(html_content, output_path)
 

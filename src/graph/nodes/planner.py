@@ -44,12 +44,17 @@ def planner_node(state: NotesState) -> dict:
     provider, model = get_model_for_node("planner")
     client = create_client("planner")
 
+    detail_instruction = (
+        "The outline should be MORE granular — include 1-2 additional subsections per main topic "
+        "for deeper coverage, with a separate introduction section and a detailed summary."
+    ) if state.get("note_mode") == "detailed" else ""
+
     user_prompt = (
         f"Class: {state['student_class']}\n"
         f"Subject: {state['subject']}\n"
         f"Chapter: {state['chapter']}\n"
         f"Medium: {state['medium']}\n\n"
-        f"Create a detailed NCERT-aligned section outline for this chapter."
+        f"Create a detailed NCERT-aligned section outline for this chapter. {detail_instruction}"
     )
 
     t0 = time.time()
