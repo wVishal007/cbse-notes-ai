@@ -5,7 +5,10 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from src.cache.research_cache import get_cached, set_cached
 from src.graph.state import NotesState, Section, SourceChunk
-from src.tools.scraper import extract_from_pdf, extract_text
+from src.tools.scraper import (
+    extract_from_pdf,
+    extract_text,
+)
 from src.tools.search import search_subtopic, to_source_chunks
 
 MAX_WORKERS = 6
@@ -45,6 +48,7 @@ def research_node(state: NotesState) -> dict:
     if cached and "research" in cached:
         return {
             "research": cached["research"],
+            "images": cached.get("images", {}),
             "timing": {"research_cache_hit": time.time() - t0},
         }
 

@@ -11,6 +11,7 @@ from src.config.settings import get_settings
 
 CACHE_DIR = Path(__file__).resolve().parent.parent.parent / "output"
 CACHE_DB = CACHE_DIR / "research_cache.db"
+SCHEMA_VERSION = 3
 
 
 def _get_db() -> sqlite3.Connection:
@@ -29,7 +30,7 @@ def _get_db() -> sqlite3.Connection:
 
 
 def _make_key(student_class: str, subject: str, chapter: str, medium: str) -> str:
-    raw = f"{student_class}|{subject.lower()}|{chapter.lower()}|{medium}"
+    raw = f"{SCHEMA_VERSION}|{student_class}|{subject.lower()}|{chapter.lower()}|{medium}"
     return hashlib.sha256(raw.encode()).hexdigest()
 
 

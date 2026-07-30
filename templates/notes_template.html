@@ -15,6 +15,13 @@
     <p class="meta">Medium: {{ medium }} | CBSE NCERT Reference</p>
 </div>
 
+{% if mindmap_svg %}
+<div class="mindmap-section">
+    <h2 class="mindmap-title">Chapter Map</h2>
+    <div class="mindmap">{{ mindmap_svg | safe }}</div>
+</div>
+{% endif %}
+
 {{ notes_body | safe }}
 
 {% if pyqs_body %}

@@ -5,7 +5,7 @@ from datetime import datetime
 from pathlib import Path
 
 from src.graph.state import NotesState
-from src.tools.pdf import export_pdf, markdown_to_html, render_html
+from src.tools.pdf import export_pdf, render_html_with_mindmap
 
 OUTPUT_DIR = Path(__file__).resolve().parent.parent.parent.parent / "output"
 
@@ -19,6 +19,12 @@ def _format_pyqs(pyqs: list[dict]) -> str:
         q_type = qa.get("question_type", "Short")
         marks = qa.get("marks", 2)
         badge = f"<span class='badge badge-{q_type.lower()}'>{q_type} | {marks} mark{'s' if marks > 1 else ''}</span>"
+        answer = qa.get("answer", "")
+        points = [ln.strip().lstrip("- *") for ln in answer.split("\n") if ln.strip().startswith(("- ", "* "))]
+        if points:
+            answer_html = "<ul>" + "".join(f"<li>{p}</li>" for p in points) + "</ul>"
+        else:
+            answer_html = f"<p class='answer'>{answer}</p>"
         parts.append(
             f"<div class='qa-card'>"
             f"<p class='q-number'>Q{i}.</p>"
@@ -26,7 +32,7 @@ def _format_pyqs(pyqs: list[dict]) -> str:
             f"<p class='question'>{qa.get('question', '')}</p>"
             f"<div class='answer-block'>"
             f"<p class='answer-label'>Answer</p>"
-            f"<p class='answer'>{qa.get('answer', '')}</p>"
+            f"{answer_html}"
             f"</div></div>"
         )
     return "\n".join(parts)
@@ -44,6 +50,7 @@ def pdf_exporter_node(state: NotesState) -> dict:
 
     formatted = state.get("formatted_notes", "")
     pyqs = state.get("pyqs", [])
+    mindmap_svg = state.get("mindmap_svg", "")
 
     pyqs_html = _format_pyqs(pyqs)
 
@@ -53,7 +60,9 @@ def pdf_exporter_node(state: NotesState) -> dict:
         "medium": state["medium"].title(),
     }
 
-    html_content = render_html(formatted, pyqs_html, template_vars)
+    html_content = render_html_with_mindmap(
+        formatted, pyqs_html, mindmap_svg, template_vars
+    )
     export_pdf(html_content, output_path)
 
     elapsed = time.time() - t0

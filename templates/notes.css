@@ -211,6 +211,45 @@ hr {
     margin: 0;
 }
 
+.answer-block ul {
+    margin: 4px 0 0 0;
+    padding-left: 18px;
+    font-family: 'Segoe UI', 'Noto Sans', Arial, sans-serif;
+    font-size: 10pt;
+}
+
+.answer-block li {
+    margin: 2px 0;
+    color: var(--ink-soft);
+}
+
+.answer-block li::marker {
+    color: var(--accent);
+}
+
+.mindmap-section {
+    margin: 24px 0 32px 0;
+    text-align: center;
+    page-break-inside: avoid;
+}
+
+.mindmap-title {
+    font-size: 13pt;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 14px;
+    border-left: none;
+    padding-left: 0;
+}
+
+.mindmap svg {
+    max-width: 85%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
 .page-break {
     page-break-before: always;
 }

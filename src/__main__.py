@@ -21,6 +21,9 @@ def main():
     parser.add_argument(
         "--medium", default="english", choices=["english", "hindi"], help="Language medium"
     )
+    parser.add_argument(
+        "--note-mode", default="short", choices=["short", "detailed"], help="Note detail level"
+    )
     parser.add_argument("--open", action="store_true", help="Open PDF after generation")
 
     args = parser.parse_args()
@@ -30,8 +33,11 @@ def main():
         "subject": args.subject,
         "chapter": args.chapter,
         "medium": args.medium,
+        "note_mode": args.note_mode,
         "plan": [],
         "research": {},
+        "aggregated_research": {},
+        "mindmap_svg": None,
         "draft_notes": {},
         "formatted_notes": "",
         "pyqs": [],

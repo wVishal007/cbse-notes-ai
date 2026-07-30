@@ -42,3 +42,6 @@ def extract_from_pdf(url: str) -> Optional[str]:
         return "\n".join(text_parts)
     except Exception:
         return None
+
+
+

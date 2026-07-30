@@ -29,8 +29,8 @@ sections):
 - Do not invent, add, or change any fact that wasn't already present in the source notes.
 
 Plain-language pass:
-- While reformatting, simplify any sentence longer than ~25 words or any unnecessarily
-  dense/academic phrasing into shorter, clearer sentences — without losing meaning.
+- While reformatting, rephrase any unnecessarily dense/academic phrasing into clearer
+  sentences — without losing detail or meaning. Do not truncate or remove substantive content.
 
 Output the FULL formatted document."""
 

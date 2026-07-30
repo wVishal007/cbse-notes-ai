@@ -73,6 +73,7 @@ class GenerateRequest(BaseModel):
     subject: str = Field(..., description="e.g. 'Science'")
     chapter: str = Field(..., description="e.g. 'Chemical Reactions and Equations'")
     medium: Literal["english", "hindi"] = "english"
+    note_mode: Literal["short", "detailed"] = "short"
 
 
 class GenerateResponse(BaseModel):
@@ -96,6 +97,7 @@ def _run_generation(job_id: str, request: GenerateRequest) -> None:
             "subject": request.subject,
             "chapter": request.chapter,
             "medium": request.medium,
+            "note_mode": request.note_mode,
             "plan": [],
             "research": {},
             "draft_notes": {},

@@ -4,38 +4,37 @@ import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from src.graph.state import NotesState, Section
-from src.models.model_router import create_client, get_model_for_node
+from src.models.clients.base import LLMClient
+from src.models.clients.gemini import GeminiClient
+from src.models.clients.groq import GroqClient
 
 MAX_WORKERS = 5
 
-SYNTHESIZER_PROMPT = """You are a CBSE NCERT notes writer. Write clear, accurate study notes for students.
+SYNTHESIZER_PROMPT = """You are a CBSE NCERT notes writer. Write clear, detailed, accurate study notes for students.
 
-Language rules (these matter more than sounding "academic"):
+Language rules:
 - Write in {medium}
-- Use short sentences (aim for under 20 words each). One idea per sentence.
 - Explain everything the way you would to a Class {student_class} student who is reading
   this topic for the first time — avoid dense, jargon-heavy phrasing.
 - The FIRST time you use a technical term, define it in plain words immediately after it.
-- Where useful, add a one-line everyday comparison or example to make an abstract idea concrete.
+- Where useful, add an everyday comparison or example to make an abstract idea concrete.
 - Rewrite concepts in your own words — do NOT copy paragraphs verbatim from source
-- Cover all key concepts listed below, and ONLY those — do not cover topics owned by other
-  sections (listed below); if this section needs to mention one, refer to it briefly by name
-  instead of re-explaining it (e.g. "as seen earlier in X" or "covered under Y").
+- Cover all key concepts listed below with sufficient depth for the target class level
 - Use proper section structure with headings
 - Bold key terms with **double asterisks**
 
 Format each section as:
 ## Section Heading
-**Key Term:** simple one-line explanation
+**Key Term:** clear explanation of the term
 
-Additional context in short sentences here.
+Additional context with detailed explanation here.
 
 Additional instructions from validator: {validator_feedback}
 """
 
 
 def _synthesize_section(
-    client: MistralClient,
+    client: LLMClient,
     system_prompt: str,
     section: Section,
     research_text: str,
@@ -45,7 +44,7 @@ def _synthesize_section(
     user_prompt = (
         f"Section: {section['heading']}\n\n"
         f"Key concepts to cover: {', '.join(section.get('key_concepts', []))}\n\n"
-        f"Research material:\n{research_text[:5000]}\n\n"
+        f"Research material:\n{research_text[:10000]}\n\n"
         f"Write the notes for this section using {heading_prefix} as the heading marker."
     )
     result = client.invoke(system_prompt, user_prompt)
@@ -53,8 +52,6 @@ def _synthesize_section(
 
 
 def synthesizer_node(state: NotesState) -> dict:
-    _, _ = get_model_for_node("synthesizer")
-
     plan = state.get("plan", [])
     research = state.get("research", {})
     aggregated = state.get("aggregated_research", {})
@@ -70,9 +67,15 @@ def synthesizer_node(state: NotesState) -> dict:
     heading_by_id = {s["id"]: s["heading"] for s in plan}
     concepts_by_id = {s["id"]: s.get("key_concepts", []) for s in plan}
 
+    synthesize_clients = [
+        GeminiClient("models/gemini-3.1-flash-lite"),
+        GeminiClient("models/gemini-3.5-flash-lite"),
+        GroqClient("llama-3.1-8b-instant"),
+    ]
+
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as pool:
         futures = []
-        for section in plan:
+        for i, section in enumerate(plan):
             section_id = section["id"]
             agg_research = aggregated.get(section_id, "")
             if agg_research:
@@ -89,15 +92,22 @@ def synthesizer_node(state: NotesState) -> dict:
                 for sid in heading_by_id
                 if sid != section_id and concepts_by_id.get(sid)
             ]
+            mode_instruction = (
+                "Expand each section with 2-3 concrete real-world examples, step-by-step "
+                "explanations, and detailed comparisons. Write 2-3× more content per section."
+            ) if state.get("note_mode") == "detailed" else ""
             system_prompt = SYNTHESIZER_PROMPT.format(
                 medium=state["medium"],
                 student_class=state["student_class"],
                 validator_feedback=validator_feedback,
             )
+            if mode_instruction:
+                system_prompt += "\n\n" + mode_instruction
             if other_topics:
                 system_prompt += "\nTopics owned by other sections: " + "; ".join(other_topics)
 
-            client = create_client("synthesizer")
+            time.sleep(i * 0.15)
+            client = synthesize_clients[i % len(synthesize_clients)]
             futures.append(pool.submit(_synthesize_section, client, system_prompt, section, research_text))
 
         for future in as_completed(futures):

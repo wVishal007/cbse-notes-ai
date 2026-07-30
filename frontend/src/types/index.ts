@@ -3,6 +3,7 @@ export interface GeneratePayload {
   subject: string
   chapter: string
   medium: 'english' | 'hindi'
+  note_mode: 'short' | 'detailed'
 }
 
 export interface GenerateResponse {

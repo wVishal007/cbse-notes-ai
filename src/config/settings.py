@@ -38,12 +38,10 @@ class Settings(BaseSettings):
 
 
 DEFAULT_MODEL_MAP: dict[str, tuple[str, str]] = {
-    "planner": ("google", "models/gemini-3.1-flash-lite"),
-    "research_search": ("google", "models/gemini-3.1-flash-lite"),
-    "research_scrape": ("nvidia_nim", "nemotron-3-8b"),
+    "planner": ("mistral", "mistral-medium"),
     "aggregator": ("google", "models/gemini-3.1-flash-lite"),
-    "synthesizer": ("mistral", "mistral-medium"),
-    "validator": ("google", "models/gemini-3.1-flash-lite"),
+    "synthesizer": ("google", "models/gemini-3.1-flash-lite"),
+    "validator": ("nvidia_nim", "nvidia/nemotron-3-ultra-550b-a55b"),
     "pyq_agent": ("google", "models/gemini-3.5-flash-lite"),
     "formatter": ("google", "models/gemini-3.5-flash-lite"),
 }
