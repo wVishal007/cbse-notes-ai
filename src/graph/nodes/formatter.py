@@ -3,13 +3,13 @@ from __future__ import annotations
 import time
 
 from src.graph.state import NotesState
-from src.models.clients.gemini import GeminiClient
-from src.models.model_router import get_model_for_node
+from src.models.model_router import create_client, get_model_for_node
 
-FORMATTER_PROMPT = """You are a document formatter for CBSE study notes. Format the following raw notes into
-structured Markdown with proper hierarchy.
+FORMATTER_PROMPT = """You are the final editor for a CBSE study notes document. The sections below were
+written independently by different passes, so the same topic may have been explained more
+than once in different sections. Format the notes into structured Markdown AND fix that.
 
-Rules:
+Formatting rules:
 - # Main Title → 16pt (use # for chapter title only)
 - ## Section Heading → 14pt
 - ### Subsection Heading → 12pt
@@ -18,14 +18,26 @@ Rules:
 - Use numbered lists (1.) for sequences/steps
 - Use tables for comparisons where appropriate
 - Add horizontal rules (---) between major sections
-- Keep the content exactly as provided — only change formatting and structure
+
+Deduplication rules (do this pass carefully — check the WHOLE document, not just adjacent
+sections):
+- If the same event, law, person, term, or fact is explained in more than one section, keep
+  the fullest, clearest explanation in the section where it fits best, and in every other
+  place replace the repeated explanation with a short one-line cross-reference instead
+  (e.g. "See **Zollverein** under 'Economic Nationalism' above.")
+- Do NOT delete a section's unique content — only remove genuine repeats of the same fact.
+- Do not invent, add, or change any fact that wasn't already present in the source notes.
+
+Plain-language pass:
+- While reformatting, simplify any sentence longer than ~25 words or any unnecessarily
+  dense/academic phrasing into shorter, clearer sentences — without losing meaning.
 
 Output the FULL formatted document."""
 
 
 def formatter_node(state: NotesState) -> dict:
-    provider, model = get_model_for_node("formatter")
-    client = GeminiClient(model=model)
+    _, _ = get_model_for_node("formatter")
+    client = create_client("formatter")
 
     draft_notes = state.get("draft_notes", {})
     plan = state.get("plan", [])

@@ -43,6 +43,7 @@ class NotesState(TypedDict):
 
     plan: list[Section]
     research: dict[str, str]
+    aggregated_research: dict[str, str]
     draft_notes: dict[str, str]
     formatted_notes: str
     pyqs: list[QA]

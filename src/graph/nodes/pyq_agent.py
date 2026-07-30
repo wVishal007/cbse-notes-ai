@@ -4,8 +4,7 @@ import json
 import time
 
 from src.graph.state import NotesState, QA
-from src.models.clients.gemini import GeminiClient
-from src.models.model_router import get_model_for_node
+from src.models.model_router import create_client, get_model_for_node
 
 PYQ_SYSTEM_PROMPT = """You are a CBSE exam question expert. Generate practice questions that follow the CBSE
 previous-year question paper pattern but are original (not exact copies).
@@ -26,8 +25,8 @@ Generate a mix: 2 MCQs, 2 Short, 1 Long per chapter."""
 
 
 def pyq_agent_node(state: NotesState) -> dict:
-    provider, model = get_model_for_node("pyq_agent")
-    client = GeminiClient(model=model)
+    _, _ = get_model_for_node("pyq_agent")
+    client = create_client("pyq_agent")
 
     draft_notes = state.get("draft_notes", {})
     all_notes = "\n\n".join(draft_notes.values())

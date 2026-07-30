@@ -24,9 +24,10 @@ def _format_pyqs(pyqs: list[dict]) -> str:
             f"<p class='q-number'>Q{i}.</p>"
             f"{badge}"
             f"<p class='question'>{qa.get('question', '')}</p>"
-            f"<details><summary>Show Answer</summary>"
+            f"<div class='answer-block'>"
+            f"<p class='answer-label'>Answer</p>"
             f"<p class='answer'>{qa.get('answer', '')}</p>"
-            f"</details></div>"
+            f"</div></div>"
         )
     return "\n".join(parts)
 

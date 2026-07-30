@@ -64,8 +64,16 @@ def export_pdf(html_content: str, output_path: str) -> str:
             format="A4",
             margin={"top": "0.8in", "bottom": "0.8in", "left": "1in", "right": "1in"},
             display_header_footer=True,
-            header_template="<div style='font-size:8pt;color:#666;text-align:center;width:100%;padding:0 1in;'>CBSE Notes AI</div>",
-            footer_template="<div style='font-size:8pt;color:#666;text-align:center;width:100%;padding:0 1in;'>Page <span class='pageNumber'></span> of <span class='totalPages'></span></div>",
+            header_template=(
+            "<div style='font-family:Georgia,serif;font-size:8pt;color:#9a3412;"
+            "text-align:center;width:100%;padding:0 1in;letter-spacing:0.04em;"
+            "text-transform:uppercase;'>CBSE Notes AI</div>"
+        ),
+            footer_template=(
+            "<div style='font-family:Segoe UI,Arial,sans-serif;font-size:8pt;color:#7a7a82;"
+            "text-align:center;width:100%;padding:0 1in;'>"
+            "Page <span class='pageNumber'></span> of <span class='totalPages'></span></div>"
+        ),
             print_background=True,
         )
     finally:
